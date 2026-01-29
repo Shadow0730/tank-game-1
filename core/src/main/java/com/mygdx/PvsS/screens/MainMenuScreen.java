@@ -3,6 +3,7 @@ package com.mygdx.PvsS.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.PvsS.tankgame;
@@ -17,13 +18,15 @@ public class MainMenuScreen implements Screen {
     public static final int pBwidth = 200;
     public static final int pBheight = 150;
 
+    private OrthographicCamera camera;
+
     Texture exitButtonactive;
     Texture playButtonactive;
     Texture background;
 
     Rectangle playButtonBounds;
     Rectangle exitButtonBounds;
-    public MainMenuScreen(tankgame game) {
+    public MainMenuScreen(tankgame game,  OrthographicCamera camera) {
         this.game = game;
         exitButtonactive = new Texture("exitButton.jpg");
         playButtonactive = new Texture("playButton.png");
@@ -57,7 +60,7 @@ public class MainMenuScreen implements Screen {
             game.batch.draw(playButtonactive, x, y, pBwidth + 20, pBheight + 20);
             if (Gdx.input.isTouched()) {
                 this.dispose();
-                game.setScreen(new GameScreen(game));
+                game.setScreen(new GameScreen(game, camera));
             }
         } else {
             game.batch.draw(playButtonactive, x, y, pBwidth, pBheight);

@@ -5,12 +5,19 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.PvsS.tankgame;
+
+import java.awt.*;
 
 public class GameScreen implements Screen {
     private tankgame game;
@@ -19,15 +26,30 @@ public class GameScreen implements Screen {
     private OrthogonalTiledMapRenderer renderer;
     private Viewport gamePort;
     private OrthographicCamera camera;
+    private World world;
+    private Box2DDebugRenderer dR;
 
-    public GameScreen(tankgame game) {
-        camera = new OrthographicCamera();
-        gamePort = new FitViewport(1280/2, 720/2, camera);
+    public GameScreen(tankgame game, OrthographicCamera camera) {
+
+        this.camera = camera;
         this.game = game;
         mapLoader = new TmxMapLoader();
         map = mapLoader.load("map.tmx");
-        camera.position.set(gamePort.getWorldWidth()/2, gamePort.getWorldHeight()/2, 0);
         renderer = new OrthogonalTiledMapRenderer(map);
+        world = new World(new Vector2(0,0), true);
+        dR = new Box2DDebugRenderer();
+
+//        BodyDef bdef = new BodyDef();
+//        PolygonShape shape = new PolygonShape();
+//        FixtureDef fdef = new FixtureDef();
+//        Body body;
+//
+//        for (MapObject object: map.getLayers().get("ground").getObjects().getByType(PolygonMapObject.class)){
+//             Polygon poly = ((PolygonMapObject) object).getPolygon();
+//
+//             bdef.type = BodyDef.BodyType.StaticBody;
+//             bdef.position.set()
+//        }
     }
 
     @Override
@@ -40,15 +62,17 @@ public class GameScreen implements Screen {
 
     public void update(float dt){
         handleInput(dt);
-        renderer.setView(camera);
+
     }
 
     @Override
     public void render(float v) {
-        update(v);
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        game.batch.setProjectionMatrix(camera.combined);
+        batch.begin();
+        batch.end();
+        camera.update();
+        renderer.setView(camera);
         renderer.render();
     }
 
