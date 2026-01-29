@@ -33,6 +33,7 @@ public class MainMenuScreen implements Screen {
         background = new Texture("background.jpg");
         int x = (width - pBwidth) / 2;
         int y = (height - pBheight) / 2;
+        this.camera = camera;
 
         playButtonBounds = new Rectangle(x, y, pBwidth, pBheight);
         exitButtonBounds = new Rectangle(width-100,height-100, Bwidth, Bheight);

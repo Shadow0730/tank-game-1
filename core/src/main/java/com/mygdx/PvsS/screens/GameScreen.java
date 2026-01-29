@@ -2,9 +2,11 @@ package com.mygdx.PvsS.screens;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -12,12 +14,16 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.mygdx.PvsS.helpers.map;
 import com.mygdx.PvsS.tankgame;
 
 import java.awt.*;
+
+import static com.mygdx.PvsS.helpers.constants.PPM;
 
 public class GameScreen implements Screen {
     private tankgame game;
@@ -28,6 +34,8 @@ public class GameScreen implements Screen {
     private OrthographicCamera camera;
     private World world;
     private Box2DDebugRenderer dR;
+    private SpriteBatch batch;
+    private map tileMapHelper;
 
     public GameScreen(tankgame game, OrthographicCamera camera) {
 
@@ -35,9 +43,11 @@ public class GameScreen implements Screen {
         this.game = game;
         mapLoader = new TmxMapLoader();
         map = mapLoader.load("map.tmx");
-        renderer = new OrthogonalTiledMapRenderer(map);
+        renderer = tileMapHelper.setupMap();
         world = new World(new Vector2(0,0), true);
         dR = new Box2DDebugRenderer();
+        this.batch = game.batch;
+        this.tileMapHelper = new map();
 
 //        BodyDef bdef = new BodyDef();
 //        PolygonShape shape = new PolygonShape();
@@ -60,20 +70,33 @@ public class GameScreen implements Screen {
 
     }
 
-    public void update(float dt){
-        handleInput(dt);
-
+    public void update(){
+        world.step(1/60f,6,2);
+        batch.setProjectionMatrix(camera.combined);
+        cameraUpdate();
+        renderer.setView(camera);
+        if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){
+            Gdx.app.exit();
+        }
     }
+
+    private void cameraUpdate(){
+        camera.position.set(new Vector3(0,0,0));
+        camera.update();
+    }
+
+
 
     @Override
     public void render(float v) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        renderer.render();
         batch.begin();
         batch.end();
-        camera.update();
-        renderer.setView(camera);
-        renderer.render();
+        this.update();
+        dR.render(world, camera.combined.scl(PPM));
     }
 
     @Override
