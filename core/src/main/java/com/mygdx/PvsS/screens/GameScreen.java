@@ -43,11 +43,11 @@ public class GameScreen implements Screen {
         this.game = game;
         mapLoader = new TmxMapLoader();
         map = mapLoader.load("map.tmx");
-        renderer = tileMapHelper.setupMap();
         world = new World(new Vector2(0,0), true);
         dR = new Box2DDebugRenderer();
         this.batch = game.batch;
-        this.tileMapHelper = new map();
+        this.tileMapHelper = new map(this);
+        renderer = tileMapHelper.setupMap();
 
 //        BodyDef bdef = new BodyDef();
 //        PolygonShape shape = new PolygonShape();
@@ -111,6 +111,10 @@ public class GameScreen implements Screen {
     @Override
     public void resume() {
 
+    }
+
+    public World getWorld() {
+        return world;
     }
 
     @Override
