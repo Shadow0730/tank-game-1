@@ -26,7 +26,7 @@ public class map {
     }
 
     public OrthogonalTiledMapRenderer setupMap(){
-        tiledMap = new TmxMapLoader().load("map.tmx");
+        tiledMap = new TmxMapLoader().load("map1.tmx");
         parseMapObjects(tiledMap.getLayers().get("ground").getObjects());
         return  new OrthogonalTiledMapRenderer(tiledMap);
     }

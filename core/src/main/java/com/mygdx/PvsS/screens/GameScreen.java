@@ -48,22 +48,11 @@ public class GameScreen implements Screen {
         this.batch = game.batch;
         this.tileMapHelper = new map(this);
         renderer = tileMapHelper.setupMap();
-
-//        BodyDef bdef = new BodyDef();
-//        PolygonShape shape = new PolygonShape();
-//        FixtureDef fdef = new FixtureDef();
-//        Body body;
-//
-//        for (MapObject object: map.getLayers().get("ground").getObjects().getByType(PolygonMapObject.class)){
-//             Polygon poly = ((PolygonMapObject) object).getPolygon();
-//
-//             bdef.type = BodyDef.BodyType.StaticBody;
-//             bdef.position.set()
-//        }
     }
 
     @Override
     public void show() {
+
 
     }
     public void handleInput(float dt){
@@ -81,7 +70,8 @@ public class GameScreen implements Screen {
     }
 
     private void cameraUpdate(){
-        camera.position.set(new Vector3(0,0,0));
+
+        camera.setToOrtho(false, 1280, 720);
         camera.update();
     }
 

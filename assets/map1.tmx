@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="20" height="10" tilewidth="64" tileheight="64" infinite="0" nextlayerid="5" nextobjectid="7">
+ <editorsettings>
+  <export format="tmx"/>
+ </editorsettings>
+ <tileset firstgid="1" source="spritesheet-tiles-default.tsx"/>
+ <tileset firstgid="325" source="spritesheet-backgrounds-default.tsx"/>
+ <layer id="1" name="Tile Layer 1" width="20" height="10">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAACmNgGAWDGexnYEhYB6Sx4f1kmLUPiK8yMjBgw/uIMBPZflzmoGNc7ifFjIHCAIDGtBsgAwAA
+  </data>
+ </layer>
+ <objectgroup id="4" name="player 1">
+  <object id="6" x="63.5007" y="443.35">
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="3" name="ground">
+  <object id="1" x="1.15456" y="447.968">
+   <polygon points="0,0 1278.09,0 1276.94,191.657 -1.15456,192.811"/>
+  </object>
+  <object id="2" x="189.347" y="451.432">
+   <polygon points="0,0 130.465,-130.465 130.465,-2.30911"/>
+  </object>
+  <object id="4" x="323.276" y="320.967">
+   <polygon points="0,0 378.695,0 379.849,127.001 -2.30911,127.001"/>
+  </object>
+  <object id="5" x="703.125" y="323.276">
+   <polygon points="0,0 0,120.074 125.847,124.692"/>
+  </object>
+ </objectgroup>
+</map>
