@@ -19,7 +19,9 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.PvsS.helpers.map;
+import com.mygdx.PvsS.players.player;
 import com.mygdx.PvsS.tankgame;
+
 
 import java.awt.*;
 
@@ -37,13 +39,14 @@ public class GameScreen implements Screen {
     private SpriteBatch batch;
     private map tileMapHelper;
 
+    private player player;
+
     public GameScreen(tankgame game, OrthographicCamera camera) {
 
         this.camera = camera;
         this.game = game;
         mapLoader = new TmxMapLoader();
-        map = mapLoader.load("map.tmx");
-        world = new World(new Vector2(0,0), true);
+        world = new World(new Vector2(0,-9.8f), true);
         dR = new Box2DDebugRenderer();
         this.batch = game.batch;
         this.tileMapHelper = new map(this);
@@ -105,6 +108,9 @@ public class GameScreen implements Screen {
 
     public World getWorld() {
         return world;
+    }
+    public void setPlayer(player player) {
+        this.player = player;
     }
 
     @Override
