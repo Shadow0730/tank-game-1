@@ -1,5 +1,7 @@
 package com.mygdx.PvsS.players;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -16,10 +18,26 @@ public class player extends player1 {
     public void update() {
         x=body.getPosition().x * PPM;
         y=body.getPosition().y * PPM;
+
+        checkUserInput();
     }
 
     @Override
     public void render(SpriteBatch batch) {
 
+    }
+
+    private void checkUserInput(){
+        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)){
+            velX=0;
+            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+                velX=-1;
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+                velX=1;
+            }
+
+            body.setLinearVelocity(velX*speed,0);
+        }
     }
 }

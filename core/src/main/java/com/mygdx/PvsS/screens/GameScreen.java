@@ -67,6 +67,7 @@ public class GameScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
         cameraUpdate();
         renderer.setView(camera);
+        player.update();
         if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){
             Gdx.app.exit();
         }
@@ -89,7 +90,7 @@ public class GameScreen implements Screen {
         batch.begin();
         batch.end();
         this.update();
-        dR.render(world, camera.combined.scl(PPM));
+        dR.render(world, camera.combined.cpy().scl(PPM));
     }
 
     @Override
