@@ -12,20 +12,20 @@ import com.mygdx.PvsS.tankgame;
 public class MainMenuScreen implements Screen {
     tankgame game;
     public static final int width = 1280;
-    public static final int height = 720;
+    public static final int height = 720;// shift to constants
     public static final int Bwidth = 50;
     public static final int Bheight = 50;
     public static final int pBwidth = 200;
-    public static final int pBheight = 150;
+    public static final int pBheight = 150;// shift to constants
 
     private OrthographicCamera camera;
 
-    Texture exitButtonactive;
-    Texture playButtonactive;
-    Texture background;
+    private Texture exitButtonactive;
+    private Texture playButtonactive;
+    private Texture background;
 
-    Rectangle playButtonBounds;
-    Rectangle exitButtonBounds;
+    private Rectangle playButtonBounds;
+    private Rectangle exitButtonBounds;
     public MainMenuScreen(tankgame game,  OrthographicCamera camera) {
         this.game = game;
         exitButtonactive = new Texture("exitButton.jpg");
@@ -41,7 +41,7 @@ public class MainMenuScreen implements Screen {
     @Override
     public void show() {
 
-    }
+    }//find use
 
     @Override
     public void render(float v) {
@@ -54,9 +54,9 @@ public class MainMenuScreen implements Screen {
 
         int x=(width-pBwidth)/2;
         int y=(height-pBheight)/2;
-        float mouseY = Gdx.graphics. getHeight() - Gdx.input.getY();
-        float mouseX = Gdx.input. getX();
-
+        float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
+        float mouseX = Gdx.input.getX();
+        //replace using button
         if (playButtonBounds.contains(Gdx.input.getX(), mouseY)) {
             game.batch.draw(playButtonactive, x, y, pBwidth + 20, pBheight + 20);
             if (Gdx.input.isTouched()) {

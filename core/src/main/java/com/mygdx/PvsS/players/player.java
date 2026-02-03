@@ -31,20 +31,13 @@ public class player extends player1 {
         velX = 0;
 
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            velX = -2;
+            velX = -1;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            velX = 10;
+            velX = 1;
         }
-        if (velX != 0 || velY != 0) {
-            // Moving - enable gravity
-            body.setGravityScale(20f);
-        } else {
-            // Not moving - disable gravity
-            body.setGravityScale(0);
-            // Also stop any vertical velocity to prevent falling
-            body.setLinearVelocity(0, 0);
-        }
+
+
         body.setLinearVelocity(velX * speed,0);
     }
 }

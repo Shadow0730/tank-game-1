@@ -7,12 +7,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.MapObject;
-import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
@@ -47,7 +44,7 @@ public class GameScreen implements Screen {
         this.game = game;
         mapLoader = new TmxMapLoader();
         world = new World(new Vector2(0,-9.8f), true);
-        dR = new Box2DDebugRenderer();
+        dR = new Box2DDebugRenderer();//use of debug
         this.batch = game.batch;
         this.tileMapHelper = new map(this);
         renderer = tileMapHelper.setupMap();
@@ -75,7 +72,7 @@ public class GameScreen implements Screen {
 
     private void cameraUpdate(){
 
-        camera.setToOrtho(false, 1280, 720);
+        camera.setToOrtho(false, 1280, 720);//why multiple ortho set
         camera.update();
     }
 

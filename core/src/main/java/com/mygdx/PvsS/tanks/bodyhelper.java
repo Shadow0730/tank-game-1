@@ -16,7 +16,6 @@ public class bodyhelper {
         shape.setAsBox(width/2/PPM, height/2/PPM);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
-        fdef.density = 1.0f;
         fdef.friction = 1.0f;
         body.createFixture(fdef);
         shape.dispose();
