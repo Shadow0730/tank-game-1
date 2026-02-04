@@ -16,8 +16,8 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.PvsS.helpers.map;
-import com.mygdx.PvsS.players.player;
 import com.mygdx.PvsS.tankgame;
+import com.mygdx.PvsS.tanks.car;
 
 
 import java.awt.*;
@@ -36,7 +36,8 @@ public class GameScreen implements Screen {
     private SpriteBatch batch;
     private map tileMapHelper;
 
-    private player player;
+    //private player player;
+    private car car;
 
     public GameScreen(tankgame game, OrthographicCamera camera) {
 
@@ -52,6 +53,16 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
+        FixtureDef fixtureDef = new FixtureDef();
+        FixtureDef wheelFixtureDef = new FixtureDef();
+        fixtureDef.density = 5;
+        fixtureDef.friction = 0.4f;
+        fixtureDef.restitution = 0.3f;
+
+        wheelFixtureDef.density = fixtureDef.density - 0.5f;
+        wheelFixtureDef.friction = 1;
+        wheelFixtureDef.restitution = 0.4f;
+        car = new car(world, fixtureDef, wheelFixtureDef, 0,3,3,1.5f);
 
 
     }
@@ -64,7 +75,7 @@ public class GameScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
         cameraUpdate();
         renderer.setView(camera);
-        player.update();
+        //player.update();
         if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){
             Gdx.app.exit();
         }
@@ -107,9 +118,9 @@ public class GameScreen implements Screen {
     public World getWorld() {
         return world;
     }
-    public void setPlayer(player player) {
-        this.player = player;
-    }
+    //public void setPlayer(player player) {
+        //this.player = player;
+    //}
 
     @Override
     public void hide() {

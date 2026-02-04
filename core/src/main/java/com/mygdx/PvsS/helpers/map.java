@@ -10,13 +10,10 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.Shape;
-import com.mygdx.PvsS.players.player;
+import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.mygdx.PvsS.screens.GameScreen;
-import com.mygdx.PvsS.tanks.bodyhelper;
 
 import static com.mygdx.PvsS.helpers.constants.PPM;
 
@@ -39,23 +36,92 @@ public class map {
             if (mapObject instanceof PolygonMapObject){
                 createstaticbody((PolygonMapObject) mapObject);
             }
-            if (mapObject instanceof RectangleMapObject){
-                Rectangle rectangle = ((RectangleMapObject) mapObject).getRectangle();
-                String rectangleName = mapObject.getName();
-
-                if(rectangleName.equals("player")){
-                    Body body = bodyhelper.createBody(
-                        rectangle.getX() + rectangle.getWidth() / 2,
-                        rectangle.getY() + rectangle.getHeight() / 2,
-                        rectangle.getWidth(),
-                        rectangle.getHeight(),
-                        false,
-                        gameScreen.getWorld()
-                    );
-                    gameScreen.setPlayer(new player(rectangle.getWidth(), rectangle.getHeight(), body));
-                }
-            }
+//            if (mapObject instanceof RectangleMapObject){
+//                Rectangle rectangle = ((RectangleMapObject) mapObject).getRectangle();
+//                String rectangleName = mapObject.getName();
+//
+//                if(rectangleName != null && rectangleName.equals("player")){
+//                    float centerX = rectangle.getX() + rectangle.getWidth() / 2;
+//                    float centerY = rectangle.getY() + rectangle.getHeight() / 2;
+//
+//                    // Create tank body (main chassis)
+//                    Body tankBody = createTankBody(centerX, centerY, rectangle.getWidth(), rectangle.getHeight());
+//
+//                    // Create left wheel
+//                    Body leftWheel = createWheel(centerX - rectangle.getWidth()/3, centerY - rectangle.getHeight()/2,1.0f);
+//
+//                    // Create right wheel
+//                    Body rightWheel = createWheel(centerX + rectangle.getWidth()/3, centerY - rectangle.getHeight()/2,4.0f);
+//
+//                    // Connect wheels to tank with revolute joints (with motors)
+//                    RevoluteJoint leftJoint = createWheelJoint(tankBody, leftWheel, true);
+//                    RevoluteJoint rightJoint = createWheelJoint(tankBody, rightWheel, true);
+//
+//                    // Create player with tank and joints
+//                    player newPlayer = new player(rectangle.getWidth(), rectangle.getHeight(), tankBody, gameScreen.getWorld());
+//                    newPlayer.setWheelJoints(leftJoint, rightJoint);
+//                    gameScreen.setPlayer(newPlayer);
+//                }
+//            }
         }
+    }
+
+    private Body createTankBody(float x, float y, float width, float height) {
+        BodyDef bdef = new BodyDef();
+        bdef.position.set(x/PPM, y/PPM);
+        bdef.type = BodyDef.BodyType.DynamicBody;
+        bdef.fixedRotation = false;  // Allow rotation on slopes!
+
+        Body body = gameScreen.getWorld().createBody(bdef);
+
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(width/2/PPM, height/2/PPM);
+
+        FixtureDef fdef = new FixtureDef();
+        fdef.shape = shape;
+        fdef.density = 1.0f;
+        fdef.friction = 0.5f;
+        fdef.restitution = 0.0f;
+
+        body.createFixture(fdef);
+        shape.dispose();
+        return body;
+    }
+
+    private Body createWheel(float x, float y, float mass) {
+        BodyDef bdef = new BodyDef();
+        bdef.position.set(x/PPM, y/PPM);
+        bdef.type = BodyDef.BodyType.DynamicBody;
+
+        Body body = gameScreen.getWorld().createBody(bdef);
+
+        CircleShape shape = new CircleShape();
+        shape.setRadius(10/PPM);  // Small wheel radius
+
+        FixtureDef fdef = new FixtureDef();
+        fdef.shape = shape;
+        fdef.density = mass;
+        fdef.friction = 10.0f;  // HIGH friction so wheels grip slopes!
+        fdef.restitution = 0.0f;
+
+        body.createFixture(fdef);
+        shape.dispose();
+        return body;
+    }
+
+    private RevoluteJoint createWheelJoint(Body tankBody, Body wheelBody, boolean enableMotor) {
+        RevoluteJointDef jointDef = new RevoluteJointDef();
+        jointDef.bodyA = tankBody;
+        jointDef.bodyB = wheelBody;
+        jointDef.localAnchorA.set(wheelBody.getPosition().sub(tankBody.getPosition()));
+        jointDef.localAnchorB.set(0, 0);
+
+        // Enable motor for driving
+        jointDef.enableMotor = enableMotor;
+        jointDef.maxMotorTorque = 50.0f;  // How strong the motor is
+        jointDef.motorSpeed = 0;  // Start at 0, will be set by input
+
+        return (RevoluteJoint) gameScreen.getWorld().createJoint(jointDef);
     }
 
     private void createstaticbody(PolygonMapObject polygonMapObject){
