@@ -18,6 +18,7 @@ public class tankgame extends Game {
         batch = new SpriteBatch();
         this.camera = new OrthographicCamera();
         this.camera.setToOrtho(false, 800, 480);
+
         this.setScreen(new MainMenuScreen(this, camera));
     }
 

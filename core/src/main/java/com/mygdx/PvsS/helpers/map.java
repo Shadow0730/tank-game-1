@@ -66,7 +66,7 @@ public class map {
         }
     }
 
-    
+
     private void createstaticbody(PolygonMapObject polygonMapObject){
         BodyDef bodydef =new BodyDef();
         bodydef.type = BodyDef.BodyType.StaticBody;

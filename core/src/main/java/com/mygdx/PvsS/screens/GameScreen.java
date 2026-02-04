@@ -42,6 +42,9 @@ public class GameScreen implements Screen {
     public GameScreen(tankgame game, OrthographicCamera camera) {
 
         this.camera = camera;
+        camera.setToOrtho(false, 1280, 720);
+        camera.position.set(640, 360, 0); // Center of screen
+        camera.update();
         this.game = game;
         mapLoader = new TmxMapLoader();
         world = new World(new Vector2(0,-9.8f), true);
@@ -62,7 +65,7 @@ public class GameScreen implements Screen {
         wheelFixtureDef.density = fixtureDef.density - 0.5f;
         wheelFixtureDef.friction = 1;
         wheelFixtureDef.restitution = 0.4f;
-        car = new car(world, fixtureDef, wheelFixtureDef, 0,3,3,1.5f);
+        car = new car(world,fixtureDef, wheelFixtureDef, 6.4f, 5f, 3f, 1.5f);
 
 
     }
@@ -83,7 +86,7 @@ public class GameScreen implements Screen {
 
     private void cameraUpdate(){
 
-        camera.setToOrtho(false, 1280, 720);//why multiple ortho set
+        camera.position.set(640, 360, 0);
         camera.update();
     }
 
