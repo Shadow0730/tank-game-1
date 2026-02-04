@@ -1,6 +1,5 @@
 package com.mygdx.PvsS.screens;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -11,16 +10,13 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.physics.box2d.joints.WheelJoint;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.PvsS.helpers.map;
 import com.mygdx.PvsS.tankgame;
 import com.mygdx.PvsS.tanks.car;
 
-
-import java.awt.*;
 
 import static com.mygdx.PvsS.helpers.constants.PPM;
 
@@ -37,7 +33,10 @@ public class GameScreen implements Screen {
     private map tileMapHelper;
 
     //private player player;
-    private car car;
+    private car Car;
+    
+
+
 
     public GameScreen(tankgame game, OrthographicCamera camera) {
 
@@ -65,7 +64,17 @@ public class GameScreen implements Screen {
         wheelFixtureDef.density = fixtureDef.density - 0.5f;
         wheelFixtureDef.friction = 1;
         wheelFixtureDef.restitution = 0.4f;
-        car = new car(world,fixtureDef, wheelFixtureDef, 6.4f, 5f, 3f, 1.5f);
+        Car = new car(world,fixtureDef, wheelFixtureDef, 1f, 2f, 0.5f, 0.5f);
+        // Top-left corner
+        createTestBox(world, 1f, 6.2f);
+        // Top-right corner
+        createTestBox(world, 11.8f, 6.2f);
+        // Bottom-left corner
+        createTestBox(world, 1f, 1f);
+        // Bottom-right corner
+        createTestBox(world, 11.8f, 1f);
+        // Center
+        createTestBox(world, 6.4f, 3.6f);
 
 
     }
@@ -88,6 +97,19 @@ public class GameScreen implements Screen {
 
         camera.position.set(640, 360, 0);
         camera.update();
+    }
+    private void createTestBox(World world, float x, float y) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.StaticBody;
+        bodyDef.position.set(x, y);
+        Body body = world.createBody(bodyDef);
+
+        PolygonShape box = new PolygonShape();
+        box.setAsBox(0.5f, 0.5f);
+        body.createFixture(box, 0f);
+        box.dispose();
+
+        System.out.println("Test box at: " + x + ", " + y + " (pixels: " + (x*100) + ", " + (y*100) + ")");
     }
 
 
