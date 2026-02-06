@@ -2,6 +2,7 @@ package com.mygdx.PvsS.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -34,7 +35,7 @@ public class GameScreen implements Screen {
 
     //private player player;
     private car Car;
-    
+
 
 
 
@@ -61,20 +62,11 @@ public class GameScreen implements Screen {
         fixtureDef.friction = 0.4f;
         fixtureDef.restitution = 0.3f;
 
-        wheelFixtureDef.density = fixtureDef.density - 0.5f;
+        wheelFixtureDef.density = fixtureDef.density * 1.5f;
         wheelFixtureDef.friction = 1;
         wheelFixtureDef.restitution = 0.4f;
-        Car = new car(world,fixtureDef, wheelFixtureDef, 1f, 2f, 0.5f, 0.5f);
-        // Top-left corner
-        createTestBox(world, 1f, 6.2f);
-        // Top-right corner
-        createTestBox(world, 11.8f, 6.2f);
-        // Bottom-left corner
-        createTestBox(world, 1f, 1f);
-        // Bottom-right corner
-        createTestBox(world, 11.8f, 1f);
-        // Center
-        createTestBox(world, 6.4f, 3.6f);
+        Car = new car(world,fixtureDef, wheelFixtureDef, 1f, 3f, 1f, .5f);
+        Gdx.input.setInputProcessor(new InputMultiplexer(Car));
 
 
     }
@@ -98,19 +90,7 @@ public class GameScreen implements Screen {
         camera.position.set(640, 360, 0);
         camera.update();
     }
-    private void createTestBox(World world, float x, float y) {
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(x, y);
-        Body body = world.createBody(bodyDef);
 
-        PolygonShape box = new PolygonShape();
-        box.setAsBox(0.5f, 0.5f);
-        body.createFixture(box, 0f);
-        box.dispose();
-
-        System.out.println("Test box at: " + x + ", " + y + " (pixels: " + (x*100) + ", " + (y*100) + ")");
-    }
 
 
 
