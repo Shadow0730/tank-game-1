@@ -36,9 +36,6 @@ public class GameScreen implements Screen {
     //private player player;
     private car Car;
 
-
-
-
     public GameScreen(tankgame game, OrthographicCamera camera) {
 
         this.camera = camera;
@@ -58,13 +55,14 @@ public class GameScreen implements Screen {
     public void show() {
         FixtureDef fixtureDef = new FixtureDef();
         FixtureDef wheelFixtureDef = new FixtureDef();
-        fixtureDef.density = 5;
-        fixtureDef.friction = 0.4f;
-        fixtureDef.restitution = 0.3f;
+        fixtureDef.density = 2;
+        fixtureDef.friction = 0.3f;
+        fixtureDef.restitution = 0.1f;
 
-        wheelFixtureDef.density = fixtureDef.density * 1.5f;
-        wheelFixtureDef.friction = 1;
-        wheelFixtureDef.restitution = 0.4f;
+
+        wheelFixtureDef.density = 1.5f;
+        wheelFixtureDef.friction = 3.0f;
+        wheelFixtureDef.restitution = 0.2f;
         Car = new car(world,fixtureDef, wheelFixtureDef, 1f, 3f, 1f, .5f);
         Gdx.input.setInputProcessor(new InputMultiplexer(Car));
 
@@ -80,6 +78,9 @@ public class GameScreen implements Screen {
         cameraUpdate();
         renderer.setView(camera);
         //player.update();
+        if (Car != null) {
+            Car.update();
+        }
         if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){
             Gdx.app.exit();
         }
