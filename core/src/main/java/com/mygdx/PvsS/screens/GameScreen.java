@@ -6,6 +6,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -55,15 +56,22 @@ public class GameScreen implements Screen {
     public void show() {
         FixtureDef fixtureDef = new FixtureDef();
         FixtureDef wheelFixtureDef = new FixtureDef();
-        fixtureDef.density = 2;
-        fixtureDef.friction = 0.3f;
+        FixtureDef rwheelFixtureDef = new FixtureDef();
+        fixtureDef.density = 2.0f;
+        fixtureDef.friction = 2.0f;
         fixtureDef.restitution = 0.1f;
 
 
         wheelFixtureDef.density = 1.5f;
         wheelFixtureDef.friction = 3.0f;
         wheelFixtureDef.restitution = 0.2f;
-        Car = new car(world,fixtureDef, wheelFixtureDef, 1f, 3f, 1f, .5f);
+
+        rwheelFixtureDef.density = 3.0f;
+        rwheelFixtureDef.friction = 3.0f;
+        rwheelFixtureDef.restitution = 0.2f;
+        Texture turretTexture = new Texture(Gdx.files.internal("libgdx.png"));
+        Texture projectileTexture = new Texture(Gdx.files.internal("libgdx.png"));
+        Car = new car(world,fixtureDef, wheelFixtureDef, rwheelFixtureDef, 1f, 3f, 1f, .5f,turretTexture,projectileTexture);
         Gdx.input.setInputProcessor(new InputMultiplexer(Car));
 
 
@@ -75,12 +83,14 @@ public class GameScreen implements Screen {
     public void update(){
         world.step(1/60f,6,2);
         batch.setProjectionMatrix(camera.combined);
+
         cameraUpdate();
         renderer.setView(camera);
         //player.update();
         if (Car != null) {
-            Car.update();
+            Car.update(Gdx.graphics.getDeltaTime());
         }
+
         if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){
             Gdx.app.exit();
         }
@@ -102,6 +112,9 @@ public class GameScreen implements Screen {
 
         renderer.render();
         batch.begin();
+        if (Car != null) {
+            Car.render(batch);
+        }
         batch.end();
         this.update();
         dR.render(world, camera.combined.cpy().scl(PPM));
