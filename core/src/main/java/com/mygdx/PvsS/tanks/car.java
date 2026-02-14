@@ -3,6 +3,7 @@ package com.mygdx.PvsS.tanks;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -30,14 +31,16 @@ public class car extends InputAdapter {
     private float turretLength = 80f;
     private turret gunManager;
     private float power = 5f;
+    private OrthographicCamera camera;
 
-    public car(World world, FixtureDef chassisFdef, FixtureDef wheelFdef, FixtureDef rwheeldef, float x,float y,float width, float height, Texture turretTexture, Texture projectileTexture) {
+    public car(World world,OrthographicCamera camera, FixtureDef chassisFdef, FixtureDef wheelFdef, FixtureDef rwheeldef, float x,float y,float width, float height, Texture turretTexture, Texture projectileTexture) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(x,y);
         bodyDef.angularDamping = 10.0f;  // VERY HIGH - resists rotation strongly!
         bodyDef.linearDamping = 1.0f;
         this.world = world;
+        this.camera = camera;
 
         //chassis
         Vector2[] vertices = new Vector2[4];
@@ -178,22 +181,22 @@ public class car extends InputAdapter {
     }
 
     private void updateTurretAngle() {
-        // Get mouse position
+        // Get mouse position in screen coordinates
         int mouseX = Gdx.input.getX();
         int mouseY = Gdx.input.getY();
 
-        // Convert to world coordinates
+        // FIXED: Properly convert screen coordinates to world coordinates
         Vector3 worldCoords = new Vector3(mouseX, mouseY, 0);
+        camera.unproject(worldCoords); // This actually converts the coordinates!
 
-
-        // Get chassis position in pixels
+        // Get chassis position in world coordinates (Box2D)
         Vector2 chassisPos = chassis.getPosition();
-        float chassisPixelX = chassisPos.x * PPM;
-        float chassisPixelY = chassisPos.y * PPM;
+        float chassisWorldX = chassisPos.x * PPM;
+        float chassisWorldY = chassisPos.y * PPM;
 
-        // Calculate angle from chassis to mouse
-        float dx = (worldCoords.x/PPM) - chassisPixelX;
-        float dy = (worldCoords.y/PPM) - chassisPixelY;
+        // Calculate angle from chassis to mouse (both in world coordinates now)
+        float dx = worldCoords.x - chassisWorldX;
+        float dy = worldCoords.y - chassisWorldY;
         turretAngle = (float) Math.toDegrees(Math.atan2(dy, dx));
     }
 
@@ -218,6 +221,4 @@ public class car extends InputAdapter {
     public float getPower() {
         return power;
     }
-
-
 }

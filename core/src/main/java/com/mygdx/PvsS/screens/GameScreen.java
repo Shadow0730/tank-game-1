@@ -16,6 +16,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.joints.WheelJoint;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.PvsS.helpers.map;
+import com.mygdx.PvsS.helpers.worldContactListner;
 import com.mygdx.PvsS.tankgame;
 import com.mygdx.PvsS.tanks.car;
 
@@ -50,6 +51,7 @@ public class GameScreen implements Screen {
         this.batch = game.batch;
         this.tileMapHelper = new map(this);
         renderer = tileMapHelper.setupMap();
+        world.setContactListener(new worldContactListner());
     }
 
     @Override
@@ -71,7 +73,7 @@ public class GameScreen implements Screen {
         rwheelFixtureDef.restitution = 0.2f;
         Texture turretTexture = new Texture(Gdx.files.internal("libgdx.png"));
         Texture projectileTexture = new Texture(Gdx.files.internal("libgdx.png"));
-        Car = new car(world,fixtureDef, wheelFixtureDef, rwheelFixtureDef, 1f, 3f, 1f, .5f,turretTexture,projectileTexture);
+        Car = new car(world,camera,fixtureDef, wheelFixtureDef, rwheelFixtureDef, 1f, 3f, 1f, .5f,turretTexture,projectileTexture);
         Gdx.input.setInputProcessor(new InputMultiplexer(Car));
 
 
@@ -80,7 +82,7 @@ public class GameScreen implements Screen {
 
     }
 
-    public void update(){
+    public void update(float delta){
         world.step(1/60f,6,2);
         batch.setProjectionMatrix(camera.combined);
 
@@ -88,7 +90,7 @@ public class GameScreen implements Screen {
         renderer.setView(camera);
         //player.update();
         if (Car != null) {
-            Car.update(Gdx.graphics.getDeltaTime());
+            Car.update(delta);
         }
 
         if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){
@@ -97,7 +99,6 @@ public class GameScreen implements Screen {
     }
 
     private void cameraUpdate(){
-
         camera.position.set(640, 360, 0);
         camera.update();
     }
@@ -116,7 +117,7 @@ public class GameScreen implements Screen {
             Car.render(batch);
         }
         batch.end();
-        this.update();
+        this.update(v);
         dR.render(world, camera.combined.cpy().scl(PPM));
     }
 
