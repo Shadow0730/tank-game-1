@@ -17,16 +17,13 @@ public class projectile {
     private float height = 15;  // pixels
 
     public projectile(World world, float x, float y, float angle, float power, Texture texture) {
-
-        // Create Box2D body
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(x / PPM, y / PPM);
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.bullet = true;  // Fast-moving projectile
+        bodyDef.bullet = true;
 
         body = world.createBody(bodyDef);
 
-        // Create projectile shape (rectangle)
         PolygonShape shape = new PolygonShape();
         shape.setAsBox((width/2) / PPM, (height/2) / PPM);
 
@@ -40,13 +37,10 @@ public class projectile {
         body.setUserData("projectile");
         shape.dispose();
 
-        // Create sprite
         sprite = new Sprite(new TextureRegion(texture));
         sprite.setSize(width, height);
         sprite.setOrigin(width/2, height/2);
 
-        // Calculate velocity from angle and power
-        // Tank Stars uses: startingVelocity.rotateDeg(deg - 45).scl(power/4)
         Vector2 velocity = new Vector2(3, 4);  // Base velocity
         velocity.rotateDeg(angle - 45);
         velocity.scl(power / 4f);

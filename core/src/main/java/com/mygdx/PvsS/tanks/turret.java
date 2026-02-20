@@ -23,18 +23,15 @@ public class turret {
     }
 
     public void update(float delta) {
-        // Update all projectiles
         for (int i = projectiles.size() - 1; i >= 0; i--) {
             projectile projectile = projectiles.get(i);
             projectile.update(delta);
 
-            // Check for ground collision
             if (projectile.getBody().getUserData() != null &&
                 projectile.getBody().getUserData().equals("destroy")) {
                 projectile.markForDestruction();
             }
 
-            // Remove destroyed projectiles
             if (projectile.shouldDestroy()) {
                 world.destroyBody(projectile.getBody());
                 projectiles.remove(i);

@@ -72,6 +72,7 @@ public class map {
         bodydef.type = BodyDef.BodyType.StaticBody;
         Body body = gameScreen.getWorld().createBody(bodydef);
         Shape shape = createPolygonShape(polygonMapObject);
+        body.setUserData("ground");
         body.createFixture(shape,1000);
         shape.dispose();
     }

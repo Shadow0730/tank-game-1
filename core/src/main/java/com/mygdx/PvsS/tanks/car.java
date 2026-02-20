@@ -112,17 +112,14 @@ public class car extends InputAdapter {
                 rightAxis.setMotorSpeed(motorSpeed);
                 break;
             case Keys.LEFT:
-                // Decrease power
                 power = Math.max(10, power - 5);
                 System.out.println("Power: " + power);
                 break;
             case Keys.RIGHT:
-                // Increase power
                 power = Math.min(100, power + 5);
                 System.out.println("Power: " + power);
                 break;
             case Keys.F:
-                // Fire projectile
                 shoot();
                 break;
         }
@@ -145,7 +142,6 @@ public class car extends InputAdapter {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        // Left click to shoot (Tank Stars style)
         if (button == Input.Buttons.LEFT) {
             shoot();
         }
@@ -153,48 +149,35 @@ public class car extends InputAdapter {
     }
 
     private void shoot() {
-        // Get turret tip position
         Vector2 chassisPos = chassis.getPosition();
         float turretRadians = (float) Math.toRadians(turretAngle);
 
         float tipX = (chassisPos.x * PPM) + (float) Math.cos(turretRadians) * turretLength;
         float tipY = (chassisPos.y * PPM) + (float) Math.sin(turretRadians) * turretLength;
 
-        // Shoot from turret tip
         gunManager.shoot(tipX, tipY, turretAngle, power);
         System.out.println("BANG! Power: " + power + ", Angle: " + turretAngle + "°");
     }
 
     public void update(float delta) {
-        // Update turret angle to point at mouse
         updateTurretAngle();
-
-        // Update gun manager
         gunManager.update(delta);
-
-        // Update chassis sprite position
         Vector2 pos = chassis.getPosition();
-
-        // Update turret sprite position (follows chassis)
         turretSprite.setPosition(pos.x * PPM, pos.y * PPM);
         turretSprite.setRotation(turretAngle);
     }
 
     private void updateTurretAngle() {
-        // Get mouse position in screen coordinates
         int mouseX = Gdx.input.getX();
         int mouseY = Gdx.input.getY();
 
-        // FIXED: Properly convert screen coordinates to world coordinates
         Vector3 worldCoords = new Vector3(mouseX, mouseY, 0);
-        camera.unproject(worldCoords); // This actually converts the coordinates!
+        camera.unproject(worldCoords);
 
-        // Get chassis position in world coordinates (Box2D)
         Vector2 chassisPos = chassis.getPosition();
         float chassisWorldX = chassisPos.x * PPM;
         float chassisWorldY = chassisPos.y * PPM;
 
-        // Calculate angle from chassis to mouse (both in world coordinates now)
         float dx = worldCoords.x - chassisWorldX;
         float dy = worldCoords.y - chassisWorldY;
         turretAngle = (float) Math.toDegrees(Math.atan2(dy, dx));

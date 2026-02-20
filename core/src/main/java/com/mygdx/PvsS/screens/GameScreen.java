@@ -37,6 +37,7 @@ public class GameScreen implements Screen {
 
     //private player player;
     private car Car;
+    private car Car2;
 
     public GameScreen(tankgame game, OrthographicCamera camera) {
 
@@ -74,6 +75,7 @@ public class GameScreen implements Screen {
         Texture turretTexture = new Texture(Gdx.files.internal("libgdx.png"));
         Texture projectileTexture = new Texture(Gdx.files.internal("libgdx.png"));
         Car = new car(world,camera,fixtureDef, wheelFixtureDef, rwheelFixtureDef, 1f, 3f, 1f, .5f,turretTexture,projectileTexture);
+        Car2 = new car(world,camera,fixtureDef, wheelFixtureDef, rwheelFixtureDef, 5f, 3f, 1f, .5f,turretTexture,projectileTexture);
         Gdx.input.setInputProcessor(new InputMultiplexer(Car));
 
 
