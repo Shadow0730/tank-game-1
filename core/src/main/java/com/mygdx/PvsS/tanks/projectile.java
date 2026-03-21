@@ -15,6 +15,7 @@ public class projectile {
     private boolean shouldDestroy = false;
     private float width = 50;   // pixels
     private float height = 15;  // pixels
+    private int damage = 20;
 
     public projectile(World world, float x, float y, float angle, float power, Texture texture) {
         BodyDef bodyDef = new BodyDef();
@@ -73,5 +74,8 @@ public class projectile {
 
     public void markForDestruction() {
         shouldDestroy = true;
+    }
+    public int getDamage() {
+        return damage;
     }
 }
