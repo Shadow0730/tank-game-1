@@ -25,7 +25,7 @@ public class car extends InputAdapter {
     private World world;
     private Body chassis, leftWheel, rightWheel;
     private WheelJoint leftAxis, rightAxis;
-    private float motorSpeed = 80f;
+    private float motorSpeed = 10f;
     private Sprite turretSprite;
     private Sprite healthbarSprite;
     private float turretAngle = 0;
@@ -44,7 +44,7 @@ public class car extends InputAdapter {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(x,y);
-        bodyDef.angularDamping = 10.0f;  // VERY HIGH - resists rotation strongly!
+        bodyDef.angularDamping = 5.0f;  // VERY HIGH - resists rotation strongly!
         bodyDef.linearDamping = 1.0f;
         this.world = world;
         this.camera = camera;
@@ -88,7 +88,7 @@ public class car extends InputAdapter {
         axisDef.frequencyHz = 5f;
         axisDef.dampingRatio = 0.7f;
         axisDef.localAxisA.set(Vector2.Y);
-        axisDef.maxMotorTorque = 800;
+        axisDef.maxMotorTorque = chassisFdef.density*10;
         leftAxis = (WheelJoint) world.createJoint(axisDef);
 
         //right axis
@@ -274,6 +274,8 @@ public class car extends InputAdapter {
         renderHealthBar(batch);
     }
     private void renderHealthBar(SpriteBatch batch) {
+        Texture barTexture = new Texture(Gdx.files.internal("libgdx.png"));
+        healthbarSprite = new Sprite(barTexture);
         Vector2 pos = chassis.getPosition();
         float barWidth = 60;
         float barHeight = 8;
