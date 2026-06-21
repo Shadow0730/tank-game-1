@@ -12,7 +12,6 @@ import static com.mygdx.PvsS.helpers.constants.PPM;
 public class powerup {
     public enum PowerupType {
         HEALTH_BOOST(30, "Health +30"),
-        POWER_BOOST(20, "Power +20"),
         DAMAGE_BOOST(15, "Damage +15");
 
         private final int value;
@@ -33,8 +32,6 @@ public class powerup {
     private boolean collected = false;
     private float width = 30;
     private float height = 30;
-    private float lifetime = 0;
-    private static final float MAX_LIFETIME = 30f;  // 30 seconds
 
     public powerup(World world, float x, float y, PowerupType type, Texture texture) {
         this.type = type;
@@ -63,19 +60,12 @@ public class powerup {
     public void update(float delta) {
         if (collected) return;
 
-        lifetime += delta;
-
-        // Destroy after 30 seconds
-        if (lifetime > MAX_LIFETIME) {
-            collected = true;
-        }
-
         // Update sprite position
         Vector2 pos = body.getPosition();
         sprite.setPosition(pos.x * PPM - width/2, pos.y * PPM - height/2);
 
         // Slight bobbing animation
-        sprite.setY(sprite.getY() + (float)Math.sin(lifetime) * 0.5f);
+        sprite.setY(sprite.getY() + (float)Math.sin(delta) * 0.5f);
     }
 
     public void render(SpriteBatch batch) {

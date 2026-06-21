@@ -22,9 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.mygdx.PvsS.helpers.map;
-import com.mygdx.PvsS.helpers.powerup;
-import com.mygdx.PvsS.helpers.worldContactListner;
+import com.mygdx.PvsS.helpers.*;
 import com.mygdx.PvsS.tankgame;
 import com.mygdx.PvsS.tanks.car;
 
@@ -34,6 +32,7 @@ import java.util.ArrayList;
 import static com.mygdx.PvsS.helpers.constants.PPM;
 
 public class GameScreen implements Screen {
+    private final boolean isLoadingGame;
     private tankgame game;
     private TmxMapLoader mapLoader;
     private TiledMap map;
@@ -62,7 +61,7 @@ public class GameScreen implements Screen {
     private TextButton powerUpButton;
     private TextButton powerDownButton;
 
-    public GameScreen(tankgame game, OrthographicCamera camera) {
+    public GameScreen(tankgame game, OrthographicCamera camera, boolean loadGame) {
 
         this.camera = camera;
         camera.setToOrtho(false, 1280, 720);
@@ -77,6 +76,7 @@ public class GameScreen implements Screen {
         renderer = tileMapHelper.setupMap();
         world.setContactListener(new worldContactListner());
         initializeUI();
+        this.isLoadingGame = loadGame;
     }
 
     private void initializeUI() {
@@ -214,6 +214,10 @@ public class GameScreen implements Screen {
         this.powerups = new ArrayList<>();
         spawnRandomPowerups();
 
+        if (isLoadingGame) {
+            loadGameState();
+        }
+
 
     }
     private void spawnRandomPowerups() {
@@ -251,8 +255,14 @@ public class GameScreen implements Screen {
         for (int i = powerups.size() - 1; i >= 0; i--) {
             powerup p = powerups.get(i);
             p.update(delta);
+            // Check if powerup was destroyed by bullet collision
+            if (p.getBody().getUserData() != null && p.getBody().getUserData().equals("destroy")) {
+                p.collect();
+            }
             if (p.isCollected()) {
+                world.destroyBody(p.getBody());
                 powerups.remove(i);
+                System.out.println("Powerup destroyed by bullet!");
             }
         }
 
@@ -283,6 +293,46 @@ public class GameScreen implements Screen {
             System.out.println("GAME OVER! Player 1 wins!");
             this.dispose();
             game.setScreen(new endGameScreen(game, "Player 1"));
+        }
+    }
+    private void saveGameState() {
+        gamesavedata data = new gamesavedata();
+
+        // Save Player 1
+        data.player1 = new gamesavedata.Player1Data();
+        data.player1.posX = Car.getChassis().getPosition().x;
+        data.player1.posY = Car.getChassis().getPosition().y;
+        data.player1.health = Car.getCurrentHP();
+
+        // Save Player 2
+        data.player2 = new gamesavedata.Player2Data();
+        data.player2.posX = Car2.getChassis().getPosition().x;
+        data.player2.posY = Car2.getChassis().getPosition().y;
+        data.player2.health = Car2.getCurrentHP();
+
+        // Save current turn
+        data.currentPlayerIndex = currentPlayerIndex;
+
+        SaveGameManager.saveGame(data);
+    }
+
+    private void loadGameState() {
+        gamesavedata data = SaveGameManager.loadGame();
+        if (data != null) {
+            // Load Player 1
+            Car.setPosition(data.player1.posX, data.player1.posY);
+            Car.setHealth(data.player1.health);
+
+            // Load Player 2
+            Car2.setPosition(data.player2.posX, data.player2.posY);
+            Car2.setHealth(data.player2.health);
+
+            // Load current turn
+            currentPlayerIndex = data.currentPlayerIndex;
+            Car.setActive(currentPlayerIndex == 0);
+            Car2.setActive(currentPlayerIndex == 1);
+
+            System.out.println("Game state loaded!");
         }
     }
 

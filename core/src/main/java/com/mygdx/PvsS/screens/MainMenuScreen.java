@@ -46,14 +46,14 @@ public class MainMenuScreen implements Screen {
     @Override
     public void render(float v) {
 
-        Gdx.gl.glClearColor(0,0,0,1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         game.batch.begin();
         game.batch.draw(background, 0, 0, width, height);
 
-        int x=(width-pBwidth)/2;
-        int y=(height-pBheight)/2;
+        int x = (width - pBwidth) / 2;
+        int y = (height - pBheight) / 2;
         float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
         float mouseX = Gdx.input.getX();
         //replace using button
@@ -61,18 +61,18 @@ public class MainMenuScreen implements Screen {
             game.batch.draw(playButtonactive, x, y, pBwidth + 20, pBheight + 20);
             if (Gdx.input.isTouched()) {
                 this.dispose();
-                game.setScreen(new GameScreen(game, camera));
+                game.setScreen(new GameScreen(game, camera, true));
             }
         } else {
             game.batch.draw(playButtonactive, x, y, pBwidth, pBheight);
         }
         if (exitButtonBounds.contains(mouseX, mouseY)) {
-            game.batch.draw(exitButtonactive, width-100,height-100, Bwidth+10, Bheight+10);
-            if  (Gdx.input.isTouched()) {
+            game.batch.draw(exitButtonactive, width - 100, height - 100, Bwidth + 10, Bheight + 10);
+            if (Gdx.input.isTouched()) {
                 Gdx.app.exit();
             }
         } else {
-            game.batch. draw(exitButtonactive, width-100,height-100, Bwidth, Bheight);
+            game.batch.draw(exitButtonactive, width - 100, height - 100, Bwidth, Bheight);
         }
         game.batch.end();
     }
