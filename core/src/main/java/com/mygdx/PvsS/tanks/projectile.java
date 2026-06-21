@@ -16,8 +16,11 @@ public class projectile {
     private float width = 50;   // pixels
     private float height = 15;  // pixels
     private int damage = 20;
+    private int bulletType;
 
-    public projectile(World world, float x, float y, float angle, float power, Texture texture) {
+    public projectile(World world, float x, float y, float angle, float power, Texture texture, int bulletType, int damage) {
+        this.bulletType = bulletType;
+        this.damage = damage;
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(x / PPM, y / PPM);
         bodyDef.type = BodyDef.BodyType.DynamicBody;

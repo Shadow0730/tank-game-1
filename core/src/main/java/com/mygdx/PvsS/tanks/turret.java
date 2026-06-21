@@ -17,8 +17,8 @@ public class turret {
         this.projectileTexture = projectileTexture;
     }
 
-    public void shoot(float x, float y, float angle, float power) {
-        projectile projectile = new projectile(world, x, y, angle, power, projectileTexture);
+    public void shoot(float x, float y, float angle, float power, int bulletType, int damage) {
+        projectile projectile = new projectile(world, x, y, angle, power, projectileTexture, bulletType, damage);
         projectiles.add(projectile);
     }
 

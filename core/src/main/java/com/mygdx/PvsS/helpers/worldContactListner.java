@@ -22,6 +22,9 @@ public class worldContactListner implements ContactListener {
         if (isProjectileTankCollision(userDataA, userDataB)) {
             handleProjectileTankCollision(bodyA, bodyB, userDataA, userDataB);
         }
+        if (isPowerupTankCollision(userDataA, userDataB)) {
+            handlePowerupTankCollision(bodyA, bodyB, userDataA, userDataB);
+        }
     }
 
     private boolean isProjectileGroundCollision(Object dataA, Object dataB) {
@@ -65,6 +68,27 @@ public class worldContactListner implements ContactListener {
             bodyA.setUserData("destroy");
         } else if (isProjectile(dataB)) {
             bodyB.setUserData("destroy");
+        }
+    }
+    private boolean isPowerupTankCollision(Object dataA, Object dataB) {
+        return (isPowerup(dataA) && isChassis(dataB)) ||
+            (isChassis(dataA) && isPowerup(dataB));
+    }
+
+    private boolean isPowerup(Object data) {
+        return data != null && data instanceof String && ((String)data).startsWith("powerup:");
+    }
+
+    private void handlePowerupTankCollision(Body bodyA, Body bodyB, Object dataA, Object dataB) {
+        Body powerupBody = isPowerup(dataA) ? bodyA : bodyB;
+        Body chassisBody = isChassis(dataA) ? bodyA : bodyB;
+
+        Object chassisUserData = chassisBody.getUserData();
+        if (chassisUserData instanceof car) {
+            car tank = (car) chassisUserData;
+            String powerupData = isPowerup(dataA) ? (String)dataA : (String)dataB;
+            // Powerup type can be extracted from the string if needed
+            System.out.println("Tank collected powerup!");
         }
     }
 

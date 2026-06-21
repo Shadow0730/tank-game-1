@@ -7,6 +7,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -14,12 +15,21 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.joints.WheelJoint;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.PvsS.helpers.map;
+import com.mygdx.PvsS.helpers.powerup;
 import com.mygdx.PvsS.helpers.worldContactListner;
 import com.mygdx.PvsS.tankgame;
 import com.mygdx.PvsS.tanks.car;
 
+
+import java.util.ArrayList;
 
 import static com.mygdx.PvsS.helpers.constants.PPM;
 
@@ -34,12 +44,23 @@ public class GameScreen implements Screen {
     private Box2DDebugRenderer dR;
     private SpriteBatch batch;
     private map tileMapHelper;
+    private ArrayList<powerup> powerups;
 
     //private player player;
     private car Car;
     private car Car2;
     private int currentPlayerIndex = 0;  // 0 = Car, 1 = Car2
     private boolean turnEnded = false;
+
+    // UI Elements for bullet selection
+    private Stage stage;
+    private Skin skin;
+    private BitmapFont font;
+    private TextButton bulletButton1;
+    private TextButton bulletButton2;
+    private TextButton bulletButton3;
+    private TextButton powerUpButton;
+    private TextButton powerDownButton;
 
     public GameScreen(tankgame game, OrthographicCamera camera) {
 
@@ -55,6 +76,115 @@ public class GameScreen implements Screen {
         this.tileMapHelper = new map(this);
         renderer = tileMapHelper.setupMap();
         world.setContactListener(new worldContactListner());
+        initializeUI();
+    }
+
+    private void initializeUI() {
+        stage = new Stage(new ScreenViewport());
+        Gdx.input.setInputProcessor(stage);
+
+        font = new BitmapFont();
+        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
+        skin = new Skin();
+        skin.add("default-font", font);
+
+        // Create button style
+        Texture buttonUpTexture = new Texture("libgdx.png");
+        Texture buttonDownTexture = new Texture("libgdx.png");
+
+        TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
+        buttonStyle.font = font;
+        buttonStyle.fontColor = new com.badlogic.gdx.graphics.Color(1, 1, 1, 1);
+        buttonStyle.up = new com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable(
+            new com.badlogic.gdx.graphics.g2d.TextureRegion(buttonUpTexture));
+        buttonStyle.down = new com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable(
+            new com.badlogic.gdx.graphics.g2d.TextureRegion(buttonDownTexture));
+
+        skin.add("default", buttonStyle);
+
+        // Bullet selection buttons (top left area)
+        bulletButton1 = new TextButton("Normal", skin);
+        bulletButton1.setSize(120, 40);
+        bulletButton1.setPosition(10, 720 - 50);
+        bulletButton1.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                selectBulletType(0);
+            }
+        });
+        stage.addActor(bulletButton1);
+
+        bulletButton2 = new TextButton("Explosive", skin);
+        bulletButton2.setSize(120, 40);
+        bulletButton2.setPosition(135, 720 - 50);
+        bulletButton2.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                selectBulletType(1);
+            }
+        });
+        stage.addActor(bulletButton2);
+
+        bulletButton3 = new TextButton("Piercing", skin);
+        bulletButton3.setSize(120, 40);
+        bulletButton3.setPosition(260, 720 - 50);
+        bulletButton3.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                selectBulletType(2);
+            }
+        });
+        stage.addActor(bulletButton3);
+
+        // Power adjustment buttons (top right area)
+        powerDownButton = new TextButton("Power -", skin);
+        powerDownButton.setSize(100, 40);
+        powerDownButton.setPosition(1280 - 210, 720 - 50);
+        powerDownButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                decreasePower();
+            }
+        });
+        stage.addActor(powerDownButton);
+
+        powerUpButton = new TextButton("Power +", skin);
+        powerUpButton.setSize(100, 40);
+        powerUpButton.setPosition(1280 - 105, 720 - 50);
+        powerUpButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                increasePower();
+            }
+        });
+        stage.addActor(powerUpButton);
+    }
+
+    private void selectBulletType(int type) {
+        if (Car.isActive()) {
+            Car.setBulletType(type);
+            System.out.println("Player 1 selected: " + Car.getBulletName(type));
+        } else if (Car2.isActive()) {
+            Car2.setBulletType(type);
+            System.out.println("Player 2 selected: " + Car2.getBulletName(type));
+        }
+    }
+
+    private void increasePower() {
+        if (Car.isActive()) {
+            Car.increasePower();
+        } else if (Car2.isActive()) {
+            Car2.increasePower();
+        }
+    }
+
+    private void decreasePower() {
+        if (Car.isActive()) {
+            Car.decreasePower();
+        } else if (Car2.isActive()) {
+            Car2.decreasePower();
+        }
     }
 
     @Override
@@ -80,9 +210,25 @@ public class GameScreen implements Screen {
         Car2 = new car(world,camera,fixtureDef, wheelFixtureDef, rwheelFixtureDef, 5f, 3f, 1f, .5f,turretTexture,projectileTexture);
         Car.setActive(true);   // Player 1 starts
         Car2.setActive(false);
-        Gdx.input.setInputProcessor(new InputMultiplexer(Car, Car2));
+        Gdx.input.setInputProcessor(new InputMultiplexer(stage, Car, Car2));
+        this.powerups = new ArrayList<>();
+        spawnRandomPowerups();
 
 
+    }
+    private void spawnRandomPowerups() {
+        Texture powerupTexture = new Texture(Gdx.files.internal("libgdx.png"));
+
+        // Spawn 3 random powerups on the map
+        for (int i = 0; i < 3; i++) {
+            float randomX = 200 + (float)Math.random() * 800;
+            float randomY = 200 + (float)Math.random() * 400;
+            powerup.PowerupType[] types = powerup.PowerupType.values();
+            powerup p = new powerup(world, randomX, randomY,
+                types[(int)(Math.random() * types.length)],
+                powerupTexture);
+            powerups.add(p);
+        }
     }
     public void handleInput(float dt){
 
@@ -101,6 +247,14 @@ public class GameScreen implements Screen {
         if (Car2 != null && !Car2.isDestroyed()) {
             Car2.update(delta);
         }
+        // Update powerups
+        for (int i = powerups.size() - 1; i >= 0; i--) {
+            powerup p = powerups.get(i);
+            p.update(delta);
+            if (p.isCollected()) {
+                powerups.remove(i);
+            }
+        }
 
         checkGameOver();
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
@@ -110,6 +264,9 @@ public class GameScreen implements Screen {
         if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){
             Gdx.app.exit();
         }
+        // Draw UI stage
+        stage.act(delta);
+        stage.draw();
     }
 
     private void cameraUpdate(){
@@ -119,11 +276,13 @@ public class GameScreen implements Screen {
     private void checkGameOver() {
         if (Car != null && Car.isDestroyed()) {
             System.out.println("GAME OVER! Player 2 wins!");
-            Car = null;
+            this.dispose();
+            game.setScreen(new endGameScreen(game, "Player 2"));
         }
         if (Car2 != null && Car2.isDestroyed()) {
             System.out.println("GAME OVER! Player 1 wins!");
-            Car2 = null;
+            this.dispose();
+            game.setScreen(new endGameScreen(game, "Player 1"));
         }
     }
 
@@ -142,6 +301,9 @@ public class GameScreen implements Screen {
         }
         if (Car2 != null && !Car2.isDestroyed()) {
             Car2.render(batch);
+        }
+        for (powerup p : powerups) {
+            p.render(batch);
         }
         batch.end();
         this.update(v);

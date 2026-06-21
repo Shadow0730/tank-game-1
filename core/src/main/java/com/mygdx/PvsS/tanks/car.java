@@ -40,6 +40,10 @@ public class car extends InputAdapter {
     private boolean isMovingForward = false;
     private boolean isMovingBackward = false;
 
+    private int bulletType = 0;
+    private static final String[] BULLET_NAMES = {"Normal", "Explosive", "Piercing"};
+    private static final int[] BULLET_DAMAGE = {20, 35, 15};
+
     public car(World world,OrthographicCamera camera, FixtureDef chassisFdef, FixtureDef wheelFdef, FixtureDef rwheeldef, float x,float y,float width, float height, Texture turretTexture, Texture projectileTexture) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -183,8 +187,24 @@ public class car extends InputAdapter {
         float tipX = (chassisPos.x * PPM) + (float) Math.cos(turretRadians) * turretLength;
         float tipY = (chassisPos.y * PPM) + (float) Math.sin(turretRadians) * turretLength;
 
-        gunManager.shoot(tipX, tipY, turretAngle, power);
-        System.out.println("BANG! Power: " + power + ", Angle: " + turretAngle + "°");
+        gunManager.shoot(tipX, tipY, turretAngle, power, bulletType, BULLET_DAMAGE[bulletType]);
+        System.out.println("BANG! Type: " + BULLET_NAMES[bulletType] + " Power: " + power + ", Angle: " + turretAngle + "°");
+    }
+    public void setBulletType(int type) {
+        if (type >= 0 && type < BULLET_NAMES.length) {
+            this.bulletType = type;
+            System.out.println("Bullet type changed to: " + BULLET_NAMES[type]);
+        }
+    }
+
+    public void increasePower() {
+        power = Math.min(100, power + 5);
+        System.out.println("Power: " + power);
+    }
+
+    public void decreasePower() {
+        power = Math.max(10, power - 5);
+        System.out.println("Power: " + power);
     }
 
     public void update(float delta) {
@@ -333,6 +353,14 @@ public class car extends InputAdapter {
 
     public int getMaxHP() {
         return maxHP;
+    }
+
+    public int getBulletType() {
+        return bulletType;
+    }
+
+    public String getBulletName(int type) {
+        return BULLET_NAMES[type];
     }
 
     public boolean isDestroyed() {
