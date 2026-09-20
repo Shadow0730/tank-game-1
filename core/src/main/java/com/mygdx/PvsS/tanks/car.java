@@ -11,13 +11,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
-import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.physics.box2d.joints.WheelJoint;
 import com.badlogic.gdx.physics.box2d.joints.WheelJointDef;
 import com.badlogic.gdx.Input.Keys;
-
-import java.util.ArrayList;
 
 import static com.mygdx.PvsS.helpers.constants.PPM;
 
@@ -39,12 +35,13 @@ public class car extends InputAdapter {
     private boolean isDestroyed = false;
     private boolean isMovingForward = false;
     private boolean isMovingBackward = false;
+    private Sprite chassisSprite;
 
     private int bulletType = 0;
     private static final String[] BULLET_NAMES = {"Normal", "Explosive", "Piercing"};
     private static final int[] BULLET_DAMAGE = {20, 35, 15};
 
-    public car(World world,OrthographicCamera camera, FixtureDef chassisFdef, FixtureDef wheelFdef, FixtureDef rwheeldef, float x,float y,float width, float height, Texture turretTexture, Texture projectileTexture) {
+    public car(World world,OrthographicCamera camera, float x,float y) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(x,y);
@@ -52,6 +49,32 @@ public class car extends InputAdapter {
         bodyDef.linearDamping = 1.0f;
         this.world = world;
         this.camera = camera;
+        float width = 1f;
+        float height = 0.5f;
+
+        Texture tankTexture = new Texture("Tanks/tank_model_1/tank body.png");
+        Texture turretTexture = new Texture(Gdx.files.internal("Tanks/tank_model_1/p1 turret.png"));
+        Texture projectileTexture = new Texture(Gdx.files.internal("libgdx.png"));
+
+        chassisSprite = new Sprite(new TextureRegion(tankTexture));
+        chassisSprite.setSize(width * PPM, 2.5f * PPM);
+        chassisSprite.setOrigin(chassisSprite.getWidth() / 2, chassisSprite.getHeight() / 2);
+
+        FixtureDef chassisFdef = new FixtureDef();
+        FixtureDef wheelFdef = new FixtureDef();
+        FixtureDef rwheeldef = new FixtureDef();
+
+        chassisFdef.density = 2.0f;
+        chassisFdef.friction = 2.0f;
+        chassisFdef.restitution = 0.1f;
+
+        wheelFdef.density = 1.5f;
+        wheelFdef.friction = 3.0f;
+        wheelFdef.restitution = 0.2f;
+
+        rwheeldef.density = 3.0f;
+        rwheeldef.friction = 3.0f;
+        rwheeldef.restitution = 0.2f;
 
         //chassis
         Vector2[] vertices = new Vector2[4];
@@ -70,7 +93,7 @@ public class car extends InputAdapter {
 
         //left wheel
         CircleShape wheelShape = new CircleShape();
-        wheelShape.setRadius(height/3.5f);
+        wheelShape.setRadius(height/4.0f);
         wheelFdef.shape = wheelShape;
         wheelFdef.friction = 2.5f;
         leftWheel = world.createBody(bodyDef);
@@ -88,7 +111,7 @@ public class car extends InputAdapter {
         WheelJointDef axisDef = new WheelJointDef();
         axisDef.bodyA = chassis;
         axisDef.bodyB = leftWheel;
-        axisDef.localAnchorA.set(-width/2*.75f + wheelShape.getRadius(), -height/2 * 1.25f);
+        axisDef.localAnchorA.set(-width/2.5f*.75f + wheelShape.getRadius(), -height/2 * 1.25f);
         axisDef.frequencyHz = 5f;
         axisDef.dampingRatio = 0.7f;
         axisDef.localAxisA.set(Vector2.Y);
@@ -197,14 +220,8 @@ public class car extends InputAdapter {
         }
     }
 
-    public void increasePower() {
-        power = Math.min(100, power + 5);
-        System.out.println("Power: " + power);
-    }
-
-    public void decreasePower() {
-        power = Math.max(10, power - 5);
-        System.out.println("Power: " + power);
+    public void setPower(float power) {
+        this.power = Math.max(5, Math.min(100, power));
     }
 
     public void update(float delta) {
@@ -284,17 +301,24 @@ public class car extends InputAdapter {
 
     public void render(SpriteBatch batch) {
         if (isDestroyed) return;
-        // Draw chassis
+        Vector2 pos = chassis.getPosition();
 
-        // Draw turret
+        chassisSprite.setPosition(
+            pos.x * PPM - chassisSprite.getWidth() / 2,
+            pos.y * PPM - chassisSprite.getHeight() / 2
+        );
+
+        chassisSprite.setRotation((float) Math.toDegrees(chassis.getAngle()));
+
+        chassisSprite.draw(batch);
+
         turretSprite.draw(batch);
 
-        // Draw projectiles
         gunManager.render(batch);
         renderHealthBar(batch);
     }
     private void renderHealthBar(SpriteBatch batch) {
-        Texture barTexture = new Texture(Gdx.files.internal("libgdx.png"));
+        Texture barTexture = new Texture(Gdx.files.internal("ui/slider_bar.png"));
         healthbarSprite = new Sprite(barTexture);
         Vector2 pos = chassis.getPosition();
         float barWidth = 60;
@@ -313,6 +337,19 @@ public class car extends InputAdapter {
 
         // Reset color
         batch.setColor(1, 1, 1, 1);
+    }
+
+    public void takeDamage(int damage) {
+        if (isDestroyed) return;
+
+        currentHP -= damage;
+        System.out.println("Tank hit! HP: " + currentHP + "/" + maxHP);
+
+        if (currentHP <= 0) {
+            currentHP = 0;
+            isDestroyed = true;
+            System.out.println("Tank destroyed!");
+        }
     }
 
     public Body getChassis() {
@@ -334,18 +371,7 @@ public class car extends InputAdapter {
     public boolean isActive() {
         return isActive;
     }
-    public void takeDamage(int damage) {
-        if (isDestroyed) return;
 
-        currentHP -= damage;
-        System.out.println("Tank hit! HP: " + currentHP + "/" + maxHP);
-
-        if (currentHP <= 0) {
-            currentHP = 0;
-            isDestroyed = true;
-            System.out.println("Tank destroyed!");
-        }
-    }
 
     public int getCurrentHP() {
         return currentHP;
@@ -362,8 +388,19 @@ public class car extends InputAdapter {
     public String getBulletName(int type) {
         return BULLET_NAMES[type];
     }
+    public int getBulletDamage(int type) {
+        return BULLET_DAMAGE[type];
+    }
 
     public boolean isDestroyed() {
         return isDestroyed;
+    }
+
+    public void setPosition(float x, float y) {
+        chassis.setTransform(x, y, chassis.getAngle());
+    }
+
+    public void setHealth(int hp) {
+        this.currentHP = hp;
     }
 }

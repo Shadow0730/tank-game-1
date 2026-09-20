@@ -3,6 +3,7 @@ package com.mygdx.PvsS.helpers;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.PvsS.tanks.car;
+import com.mygdx.PvsS.tanks.projectile;
 
 public class worldContactListner implements ContactListener {
     @Override
@@ -40,17 +41,18 @@ public class worldContactListner implements ContactListener {
     private void handleProjectileTankCollision(Body bodyA, Body bodyB, Object dataA, Object dataB) {
         Body projectileBody = isProjectile(dataA) ? bodyA : bodyB;
         Body chassisBody = isChassis(dataA) ? bodyA : bodyB;
+        projectile firedProjectile = (projectile) projectileBody.getUserData();
         projectileBody.setUserData("destroy");
         Object chassisUserData = chassisBody.getUserData();
         if (chassisUserData instanceof car) {
             car tank = (car) chassisUserData;
-            tank.takeDamage(20);
+            tank.takeDamage(firedProjectile.getDamage());
             System.out.println("Projectile hit tank!");
         }
     }
 
     private boolean isProjectile(Object data) {
-        return data != null && data.equals("projectile");
+        return data instanceof projectile;
     }
 
     private boolean isGround(Object data) {

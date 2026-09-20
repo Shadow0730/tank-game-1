@@ -1,0 +1,13 @@
+{
+  "player1": {
+    "posX": 0.91547924,
+    "posY": 2.3177245,
+    "health": 100
+  },
+  "player2": {
+    "posX": 5.245192,
+    "posY": 3.5962498,
+    "health": 60
+  },
+  "currentPlayerIndex": 0
+}

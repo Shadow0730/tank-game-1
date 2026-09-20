@@ -38,16 +38,20 @@ public class projectile {
         fixtureDef.friction = 0.5f;
 
         body.createFixture(fixtureDef);
-        body.setUserData("projectile");
+        body.setUserData(this);
         shape.dispose();
 
         sprite = new Sprite(new TextureRegion(texture));
         sprite.setSize(width, height);
         sprite.setOrigin(width/2, height/2);
 
-        Vector2 velocity = new Vector2(3, 4);  // Base velocity
-        velocity.rotateDeg(angle - 45);
-        velocity.scl(power / 4f);
+        float radians = (float) Math.toRadians(angle);
+
+        Vector2 velocity = new Vector2(
+            (float) Math.cos(radians),
+            (float) Math.sin(radians)
+        );
+        velocity.scl(power * 0.15f);
 
         body.setLinearVelocity(velocity);
         body.setTransform(body.getPosition(), (float) Math.toRadians(angle));
@@ -55,10 +59,18 @@ public class projectile {
 
     public void update(float delta) {
         if (body != null) {
+            Vector2 velocity = body.getLinearVelocity();
+
+            if (velocity.len2() > 0.01f) {
+                float theta = (float) Math.atan2(velocity.y, velocity.x);
+                body.setTransform(body.getPosition(), theta);
+            }
+
             sprite.setPosition(
-                body.getPosition().x * PPM - width/2,
-                body.getPosition().y * PPM - height/2
+                body.getPosition().x * PPM - width / 2,
+                body.getPosition().y * PPM - height / 2
             );
+
             sprite.setRotation((float) Math.toDegrees(body.getAngle()));
         }
     }

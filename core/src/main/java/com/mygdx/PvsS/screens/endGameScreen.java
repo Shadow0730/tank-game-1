@@ -86,7 +86,7 @@ public class endGameScreen implements Screen {
     private void restartGame() {
         this.dispose();
         OrthographicCamera camera = new OrthographicCamera();
-        game.setScreen(new GameScreen(game, camera));
+        game.setScreen(new GameScreen(game, camera, true));
     }
 
     private void goToMainMenu() {
